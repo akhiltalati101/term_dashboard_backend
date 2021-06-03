@@ -1,9 +1,0 @@
-README.md
-setup.py
-term_dashboard_backend/__init__.py
-term_dashboard_backend/users.py
-term_dashboard_backend.egg-info/PKG-INFO
-term_dashboard_backend.egg-info/SOURCES.txt
-term_dashboard_backend.egg-info/dependency_links.txt
-term_dashboard_backend.egg-info/requires.txt
-term_dashboard_backend.egg-info/top_level.txt
