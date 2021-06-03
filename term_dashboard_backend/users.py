@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
-from passlib.hash import pbkd
+from pymongo import MongoClient
+from passlib.hash import pbkdf2_sha256
+from term_dashboard_backend import db
 import uuid
 
 class User:
@@ -14,10 +16,15 @@ class User:
         }
 
         #Encrypt the password
+        user['password'] = pbkdf2_sha256.encrypt(user['password'])
 
-        return jsonify(user), 200
-
-    def login(self):
-        #authenticate user
-    
+        #Check existing user
+        if db.users.find_one({"email": user['email']}):
+            return jsonify({"error": "The email address already exists"}), 400
+        #Insert users
+        if db.users.insert(user):
+            return jsonify(user), 200
+        
+        return jsonify({"error": "Signup Failed"}), 400
+        
 
