@@ -1,12 +1,14 @@
-from flask import Flask, jsonify, request
+from flask import Flask, json, jsonify, request
 from pymongo import MongoClient
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 from passlib.hash import pbkdf2_sha256
 from term_dashboard_backend import db
 import uuid
 
 class User:
     def signup(self):
-        #  Check if user already exists, return 400 if it does.
         user = {
             "_id": uuid.uuid4().hex,
             "username": request.form.get('username'),
@@ -23,8 +25,16 @@ class User:
             return jsonify({"error": "The email address already exists"}), 400
         #Insert users
         if db.users.insert(user):
-            return jsonify(user), 200
-        
-        return jsonify({"error": "Signup Failed"}), 400
-        
+            access_token = create_access_token(identity=user['email'])
+            return jsonify(access_token=access_token)
 
+        return jsonify({"error": "Signup Failed"}), 400
+
+    def login(self):
+        user = db.users.find_one({"email": request.form.get('email')})
+
+        if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
+            access_token = create_access_token(identity=user['email'])
+            return jsonify(access_token=access_token)
+        
+        return jsonify({ "error": "Invalid login credentials" }), 401  
