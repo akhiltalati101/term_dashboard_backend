@@ -1,11 +1,14 @@
 from flask import Flask, json, jsonify, request
 from pymongo import MongoClient
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_refresh_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from passlib.hash import pbkdf2_sha256
 from term_dashboard_backend import db
 import uuid
+
+from term_dashboard_backend.routes import refresh_token
 
 class User:
     def signup(self):
@@ -35,6 +38,7 @@ class User:
 
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             access_token = create_access_token(identity=user['email'])
+            refresh_token = create_refresh_token(identity=user['email'])
             return jsonify(access_token=access_token)
         
         return jsonify({ "error": "Invalid login credentials" }), 401
@@ -49,10 +53,9 @@ class User:
 
         return jsonify({ "error": "Invalid token, user does not exist in database" }), 401
 
-    def update_token(self):
-        current_user = get_jwt_identity()
-        # if db.users.find_one({"email": current_user}):
-        #     new_access
-        return jsonify({ "error": "Invalid login credentials" }), 401
+    def refresh_token(self):
+        identity = get_jwt_identity()
+        access_token = create_access_token(identity=identity)
+        return jsonify(access_token=access_token)
 
 
