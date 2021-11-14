@@ -31,10 +31,28 @@ class User:
         return jsonify({"error": "Signup Failed"}), 400
 
     def login(self):
-        user = db.users.find_one({"email": request.form.get('email')})
+        user = db.users.find_one({"email": request.form.get('username')})
 
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             access_token = create_access_token(identity=user['email'])
             return jsonify(access_token=access_token)
         
-        return jsonify({ "error": "Invalid login credentials" }), 401  
+        return jsonify({ "error": "Invalid login credentials" }), 401
+    
+    def deadlines(self):
+        current_user_email = get_jwt_identity()
+        print(current_user_email)
+        user = db.users.find_one({"email": current_user_email})
+        if user:
+            deadlines = user['deadlines']
+            return jsonify(deadlines=deadlines)
+
+        return jsonify({ "error": "Invalid token, user does not exist in database" }), 401
+
+    def update_token(self):
+        current_user = get_jwt_identity()
+        # if db.users.find_one({"email": current_user}):
+        #     new_access
+        return jsonify({ "error": "Invalid login credentials" }), 401
+
+
