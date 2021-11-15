@@ -6,8 +6,7 @@ from flask_jwt_extended import jwt_required
 
 
 
-@app.route('/refresh', methods=['POST'])
-@jwt_required(refresh=True)
+@app.after_request
 def refresh_token():
     return User().refresh_token()
 
