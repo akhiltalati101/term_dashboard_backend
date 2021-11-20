@@ -8,8 +8,8 @@ from flask_jwt_extended import jwt_required
 
 @app.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
-def refresh_token():
-    return User().refresh_token()
+def refreshToken():
+    return User().refreshToken()
 
 @app.route('/user/signup/', methods=['POST'])
 def signup():
